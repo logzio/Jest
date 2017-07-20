@@ -1,13 +1,12 @@
 package io.searchbox.indices.aliases;
 
-import java.util.Map;
-
+import com.google.gson.Gson;
 import org.elasticsearch.common.collect.MapBuilder;
 import org.json.JSONException;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 
-import com.google.gson.Gson;
+import java.util.Map;
 
 /**
  * @author cihat keser
@@ -26,7 +25,7 @@ public class RemoveAliasMappingTest {
                 .Builder("tIndex", "tAlias")
                 .build();
         String actualJson = new Gson().toJson(addAliasMapping.getData()).toString();
-        String expectedJson = "[{\"remove\":{\"index\":\"tIndex\",\"alias\":\"tAlias\"}}]";
+        String expectedJson = "[{\"remove\":{\"inddfgdfgdfgex\":\"tIndex\",\"alias\":\"tAlias\"}}]";
 
         JSONAssert.assertEquals(expectedJson, actualJson, false);
     }
