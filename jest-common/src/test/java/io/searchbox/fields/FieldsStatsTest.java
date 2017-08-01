@@ -18,7 +18,7 @@ public class FieldsStatsTest {
     public void testBasicUriGeneration() {
         FieldStats fieldStats = new FieldStats.Builder(FIELDS).setIndex(INDEX).build();
         assertEquals("POST", fieldStats.getRestMethodName());
-        assertEquals("twitter/_field_stats", fieldStats.getURI());
+        assertEquals(INDEX + "/_field_stats", fieldStats.getURI());
         assertEquals("{\"fields\":[\"" + TEST_FIELD + "\"]}", fieldStats.getData(new Gson()));
     }
 
@@ -29,16 +29,7 @@ public class FieldsStatsTest {
         assertEquals("_field_stats", fieldStats.getURI());
         assertEquals("{\"fields\":[\"" + TEST_FIELD + "\"]}", fieldStats.getData(new Gson()));
     }
-
-
-    @Test
-    public void equalsReturnsFalseForDifferentIndex() {
-        FieldStats fieldStats1 = new FieldStats.Builder(FIELDS).setIndex("twitter").build();
-        FieldStats fieldStats2 = new FieldStats.Builder(FIELDS).setIndex("myspace").build();
-
-        assertNotEquals(fieldStats1, fieldStats2);
-    }
-
+    
     @Test
     public void testBasicUriGenerationWithLevel() {
         FieldStats fieldStats = new FieldStats.Builder(FIELDS).setIndex(INDEX).setLevel("indices").build();
@@ -46,7 +37,4 @@ public class FieldsStatsTest {
         assertEquals("twitter/_field_stats?level=indices", fieldStats.getURI());
         assertEquals("{\"fields\":[\"" + TEST_FIELD + "\"]}", fieldStats.getData(new Gson()));
     }
-
-
-
 }
