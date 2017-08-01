@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 
 public class FieldsStatsTest {
     static final String TEST_FIELD = "test_name";
@@ -29,12 +28,12 @@ public class FieldsStatsTest {
         assertEquals("_field_stats", fieldStats.getURI());
         assertEquals("{\"fields\":[\"" + TEST_FIELD + "\"]}", fieldStats.getData(new Gson()));
     }
-    
+
     @Test
     public void testBasicUriGenerationWithLevel() {
         FieldStats fieldStats = new FieldStats.Builder(FIELDS).setIndex(INDEX).setLevel("indices").build();
         assertEquals("POST", fieldStats.getRestMethodName());
-        assertEquals("twitter/_field_stats?level=indices", fieldStats.getURI());
+        assertEquals(INDEX + "/_field_stats?level=indices", fieldStats.getURI());
         assertEquals("{\"fields\":[\"" + TEST_FIELD + "\"]}", fieldStats.getData(new Gson()));
     }
 }

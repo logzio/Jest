@@ -33,7 +33,7 @@ public class FieldStats extends GenericResultAbstractAction {
         if (buildURI.isEmpty())
             return "_field_stats";
 
-        return buildURI + "_field_stats";
+        return buildURI + "/_field_stats";
     }
 
 
