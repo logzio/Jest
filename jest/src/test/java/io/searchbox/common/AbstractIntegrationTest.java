@@ -1,5 +1,6 @@
 package io.searchbox.common;
 
+import com.carrotsearch.randomizedtesting.annotations.ThreadLeakScope;
 import io.searchbox.client.JestClientFactory;
 import io.searchbox.client.config.HttpClientConfig;
 import io.searchbox.client.http.JestHttpClient;
@@ -24,6 +25,7 @@ import java.util.Collection;
  * @author Dogukan Sonmez
  */
 @Ignore
+@ThreadLeakScope(ThreadLeakScope.Scope.NONE)
 public abstract class AbstractIntegrationTest extends ESIntegTestCase {
 
     protected final JestClientFactory factory = new JestClientFactory();
