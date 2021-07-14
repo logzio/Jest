@@ -9,6 +9,7 @@ import io.searchbox.client.config.ElasticsearchVersion;
 import io.searchbox.client.config.exception.CouldNotConnectException;
 import io.searchbox.client.http.apache.HttpDeleteWithEntity;
 import io.searchbox.client.http.apache.HttpGetWithEntity;
+import org.apache.http.ContentTooLongException;
 import org.apache.http.Header;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpRequest;
@@ -68,6 +69,30 @@ public class JestHttpClient extends AbstractJestClient {
         CloseableHttpResponse response = null;
         try {
             response = executeRequest(request);
+            return deserializeResponse(response, request, clientRequest);
+        } catch (HttpHostConnectException ex) {
+            throw new CouldNotConnectException(ex.getHost().toURI(), ex);
+        } finally {
+            if (response != null) {
+                try {
+                    response.close();
+                } catch (IOException ex) {
+                    log.error("Exception occurred while closing response stream.", ex);
+                }
+            }
+        }
+    }
+
+    public <T extends JestResult> T execute(Action<T> clientRequest, RequestConfig requestConfig, long contentLengthLimit) throws IOException {
+        HttpUriRequest request = prepareRequest(clientRequest, requestConfig);
+        CloseableHttpResponse response = null;
+        try {
+            response = executeRequest(request);
+            String contentLengthHeaderValue = response.getFirstHeader("Content-Length").getValue();
+            long contentLength = Long.parseLong(contentLengthHeaderValue);
+            if (contentLength >= contentLengthLimit) {
+                throw new ContentTooLongException(String.format("Response body size of %d exceeds set limit of %d", contentLength, contentLengthLimit));
+            }
             return deserializeResponse(response, request, clientRequest);
         } catch (HttpHostConnectException ex) {
             throw new CouldNotConnectException(ex.getHost().toURI(), ex);
