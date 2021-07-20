@@ -88,10 +88,17 @@ public class JestHttpClient extends AbstractJestClient {
         CloseableHttpResponse response = null;
         try {
             response = executeRequest(request);
-            String contentLengthHeaderValue = response.getFirstHeader("Content-Length").getValue();
-            long contentLength = Long.parseLong(contentLengthHeaderValue);
-            if (contentLength >= contentLengthLimit) {
-                throw new ContentTooLongException(String.format("Response body size of %d exceeds set limit of %d", contentLength, contentLengthLimit));
+            Header contentLengthHeader = response.getFirstHeader("Content-Length");
+            if (contentLengthHeader != null) {
+                String contentLengthHeaderValue = contentLengthHeader.getValue();
+                try {
+                    long contentLength = Long.parseLong(contentLengthHeaderValue);
+                    if (contentLength >= contentLengthLimit) {
+                        throw new ContentTooLongException(String.format("Response body size of %d exceeds set limit of %d", contentLength, contentLengthLimit));
+                    }
+                } catch (NumberFormatException e) {
+                    log.warn(String.format("Content-Length contains invalid number: %s", contentLengthHeaderValue), e);
+                }
             }
             return deserializeResponse(response, request, clientRequest);
         } catch (HttpHostConnectException ex) {
