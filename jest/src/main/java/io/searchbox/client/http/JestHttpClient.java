@@ -1,16 +1,20 @@
 package io.searchbox.client.http;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import io.searchbox.action.Action;
 import io.searchbox.client.AbstractJestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.client.JestResultHandler;
 import io.searchbox.client.config.ElasticsearchVersion;
 import io.searchbox.client.config.exception.CouldNotConnectException;
+import io.searchbox.client.http.apache.ContentLengthLimitedInputStream;
 import io.searchbox.client.http.apache.HttpDeleteWithEntity;
 import io.searchbox.client.http.apache.HttpGetWithEntity;
-import org.apache.http.ContentTooLongException;
+import io.searchbox.core.MultiSearch;
+import io.searchbox.core.MultiSearchResult;
 import org.apache.http.Header;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
@@ -34,6 +38,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.Map.Entry;
 import java.util.concurrent.Future;
 
@@ -83,27 +89,44 @@ public class JestHttpClient extends AbstractJestClient {
         }
     }
 
-    public <T extends JestResult> T execute(Action<T> clientRequest, RequestConfig requestConfig, long contentLengthLimit) throws IOException {
+    public MultiSearchResult execute(MultiSearch clientRequest, RequestConfig requestConfig, int contentLengthLimit) throws IOException {
         HttpUriRequest request = prepareRequest(clientRequest, requestConfig);
         CloseableHttpResponse response = null;
+        ContentLengthLimitedInputStream lengthLimitedInputStream = null;
+        Reader lengthLimitedInputStreamReader = null;
         try {
             response = executeRequest(request);
-            Header contentLengthHeader = response.getFirstHeader("Content-Length");
-            if (contentLengthHeader != null) {
-                String contentLengthHeaderValue = contentLengthHeader.getValue();
-                try {
-                    long contentLength = Long.parseLong(contentLengthHeaderValue);
-                    if (contentLength >= contentLengthLimit) {
-                        throw new ContentTooLongException(String.format("Response body size of %d exceeds set limit of %d", contentLength, contentLengthLimit));
-                    }
-                } catch (NumberFormatException e) {
-                    log.warn(String.format("Content-Length contains invalid number: %s", contentLengthHeaderValue), e);
+            StatusLine statusLine = response.getStatusLine();
+            int statusCode = statusLine.getStatusCode();
+            String reasonPhrase = statusLine.getReasonPhrase();
+
+            HttpEntity entity = response.getEntity();
+            lengthLimitedInputStream = new ContentLengthLimitedInputStream(entity.getContent(), contentLengthLimit);
+            lengthLimitedInputStreamReader = new InputStreamReader(lengthLimitedInputStream);
+            JsonObject result = gson.fromJson(lengthLimitedInputStreamReader, JsonObject.class);
+
+            MultiSearchResult multiSearchResult = new MultiSearchResult(gson);
+            multiSearchResult.setResponseCode(statusCode);
+            multiSearchResult.setJsonString(result.toString());
+            multiSearchResult.setJsonObject(result);
+            multiSearchResult.setPathToResult(null);
+
+            if (isHttpSuccessful(statusCode)) {
+                multiSearchResult.setSucceeded(true);
+                log.debug("Request and operation succeeded");
+            } else {
+                multiSearchResult.setSucceeded(false);
+                if (multiSearchResult.getErrorMessage() == null) {
+                    multiSearchResult.setErrorMessage(statusCode + " " + (reasonPhrase == null ? "null" : reasonPhrase));
                 }
+                log.debug("Response is failed. errorMessage is " + multiSearchResult.getErrorMessage());
             }
-            return deserializeResponse(response, request, clientRequest);
+            return multiSearchResult;
         } catch (HttpHostConnectException ex) {
             throw new CouldNotConnectException(ex.getHost().toURI(), ex);
         } finally {
+            if (lengthLimitedInputStream != null) lengthLimitedInputStream.close();
+            if (lengthLimitedInputStreamReader != null) lengthLimitedInputStreamReader.close();
             if (response != null) {
                 try {
                     response.close();
@@ -112,6 +135,10 @@ public class JestHttpClient extends AbstractJestClient {
                 }
             }
         }
+    }
+
+    private boolean isHttpSuccessful(int httpCode) {
+        return (httpCode / 100) == 2;
     }
 
     @Override
