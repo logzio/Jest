@@ -17,8 +17,8 @@ public class ContentLengthLimitedInputStream extends CountingInputStream {
 
     @Override
     protected void beforeRead(int n) throws IOException {
-        if (this.getByteCount() >= contentLengthLimit)
-            throw new ContentTooLongException("ES response exceeds allowed limit");
+        if (this.getByteCount() > contentLengthLimit)
+            throw new ContentTooLongException("ES response exceeds allowed limit of " + contentLengthLimit + " bytes");
         super.beforeRead(n);
     }
 }
