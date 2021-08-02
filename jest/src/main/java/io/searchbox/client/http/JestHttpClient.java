@@ -18,6 +18,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.EntityBuilder;
@@ -138,7 +139,7 @@ public class JestHttpClient extends AbstractJestClient {
     }
 
     private boolean isHttpSuccessful(int httpCode) {
-        return (httpCode / 100) == 2;
+        return httpCode >= HttpStatus.SC_OK && httpCode < HttpStatus.SC_MULTIPLE_CHOICES;
     }
 
     @Override
