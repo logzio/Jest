@@ -20,6 +20,9 @@ import io.searchbox.core.search.sort.Sort;
 import io.searchbox.params.Parameters;
 import io.searchbox.params.SearchType;
 
+import static io.searchbox.params.Parameters.TOTAL_HITS_AS_INT;
+import static io.searchbox.params.Parameters.TRACK_TOTAL_HITS;
+
 /**
  * @author Dogukan Sonmez
  * @author cihat keser
@@ -219,6 +222,8 @@ public class Search extends AbstractAction<SearchResult> {
 
         public Builder(String query) {
             this.query = query;
+            setParameter(TRACK_TOTAL_HITS, true);
+            setParameter(TOTAL_HITS_AS_INT, true);
         }
 
         public Builder setSearchType(SearchType searchType) {

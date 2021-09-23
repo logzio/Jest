@@ -87,6 +87,10 @@ public class Parameters {
 
     public static final String TRACK_SCORES = "track_scores";
 
+    public static final String TOTAL_HITS_AS_INT = "rest_total_hits_as_int";
+
+    public static final String TRACK_TOTAL_HITS = "track_total_hits";
+
     public static final List<String> ACCEPTED_IN_BULK = Arrays.asList(
             ROUTING,
             PERCOLATOR,
