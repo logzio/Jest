@@ -8,6 +8,9 @@ import io.searchbox.action.GenericResultAbstractAction;
 import io.searchbox.client.config.ElasticsearchVersion;
 import io.searchbox.params.Parameters;
 
+import static io.searchbox.params.Parameters.TOTAL_HITS_AS_INT;
+import static io.searchbox.params.Parameters.TRACK_TOTAL_HITS;
+
 /**
  * @author ferhat
  */
@@ -58,6 +61,7 @@ public class SearchScroll extends GenericResultAbstractAction {
                 setParameter(Parameters.SCROLL_ID, scrollId);
             }
             setParameter(Parameters.SCROLL, scroll);
+            setParameter(TOTAL_HITS_AS_INT, true);
         }
 
         @Override

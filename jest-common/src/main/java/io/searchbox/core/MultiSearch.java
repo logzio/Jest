@@ -13,6 +13,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
+import static io.searchbox.params.Parameters.TOTAL_HITS_AS_INT;
+import static io.searchbox.params.Parameters.TRACK_TOTAL_HITS;
+
 /**
  * @author Dogukan Sonmez
  * @author cihat keser
@@ -113,6 +116,8 @@ public class MultiSearch extends AbstractAction<MultiSearchResult> {
         public Builder(Search search) {
             setHeader("Content-Type", "application/x-ndjson");
             searchList.add(search);
+            setParameter(TRACK_TOTAL_HITS, true);
+            setParameter(TOTAL_HITS_AS_INT, true);
         }
 
         public Builder(Collection<? extends Search> searches) {
