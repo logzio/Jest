@@ -116,14 +116,12 @@ public class MultiSearch extends AbstractAction<MultiSearchResult> {
         public Builder(Search search) {
             setHeader("Content-Type", "application/x-ndjson");
             searchList.add(search);
-            setParameter(TRACK_TOTAL_HITS, true);
             setParameter(TOTAL_HITS_AS_INT, true);
         }
 
         public Builder(Collection<? extends Search> searches) {
             setHeader("Content-Type", "application/x-ndjson");
             searchList.addAll(searches);
-            setParameter(TRACK_TOTAL_HITS, true);
             setParameter(TOTAL_HITS_AS_INT, true);
         }
 
