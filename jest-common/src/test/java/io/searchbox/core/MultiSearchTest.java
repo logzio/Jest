@@ -25,7 +25,7 @@ public class MultiSearchTest {
         MultiSearch multiSearch = new MultiSearch.Builder(search).build();
 
         assertEquals("POST", multiSearch.getRestMethodName());
-        assertEquals("/_msearch", multiSearch.getURI(ElasticsearchVersion.UNKNOWN));
+        assertEquals("/_msearch?rest_total_hits_as_int=true", multiSearch.getURI(ElasticsearchVersion.UNKNOWN));
         assertEquals("application/x-ndjson", multiSearch.getHeader("Content-Type"));
     }
 
@@ -38,7 +38,7 @@ public class MultiSearchTest {
         MultiSearch multiSearch = new MultiSearch.Builder(search).build();
 
         assertEquals("POST", multiSearch.getRestMethodName());
-        assertEquals("/_msearch", multiSearch.getURI(ElasticsearchVersion.UNKNOWN));
+        assertEquals("/_msearch?rest_total_hits_as_int=true", multiSearch.getURI(ElasticsearchVersion.UNKNOWN));
         JSONAssert.assertEquals(expectedData, multiSearch.getData(null).toString(), false);
     }
 
@@ -53,7 +53,7 @@ public class MultiSearchTest {
         MultiSearch multiSearch = new MultiSearch.Builder(search).build();
 
         assertEquals("POST", multiSearch.getRestMethodName());
-        assertEquals("/_msearch", multiSearch.getURI(ElasticsearchVersion.UNKNOWN));
+        assertEquals("/_msearch?rest_total_hits_as_int=true", multiSearch.getURI(ElasticsearchVersion.UNKNOWN));
         JSONAssert.assertEquals(expectedData, multiSearch.getData(null).toString(), false);
     }
 
@@ -71,7 +71,7 @@ public class MultiSearchTest {
         MultiSearch multiSearch = new MultiSearch.Builder(search).addSearch(search2).build();
 
         assertEquals("POST", multiSearch.getRestMethodName());
-        assertEquals("/_msearch", multiSearch.getURI(ElasticsearchVersion.UNKNOWN));
+        assertEquals("/_msearch?rest_total_hits_as_int=true", multiSearch.getURI(ElasticsearchVersion.UNKNOWN));
         JSONAssert.assertEquals(expectedData, multiSearch.getData(null).toString(), false);
     }
 
@@ -98,7 +98,7 @@ public class MultiSearchTest {
         MultiSearch multiSearch = new MultiSearch.Builder(search).addSearch(search2).build();
 
         assertEquals("POST", multiSearch.getRestMethodName());
-        assertEquals("/_msearch", multiSearch.getURI(ElasticsearchVersion.UNKNOWN));
+        assertEquals("/_msearch?rest_total_hits_as_int=true", multiSearch.getURI(ElasticsearchVersion.UNKNOWN));
         JSONAssert.assertEquals(expectedData, multiSearch.getData(null), false);
     }
 
