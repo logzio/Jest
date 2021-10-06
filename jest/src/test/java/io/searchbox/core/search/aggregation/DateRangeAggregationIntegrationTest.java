@@ -4,7 +4,7 @@ import io.searchbox.common.AbstractIntegrationTest;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
-import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
+import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.test.ESIntegTestCase;
 import org.junit.Test;
@@ -27,7 +27,7 @@ public class DateRangeAggregationIntegrationTest extends AbstractIntegrationTest
     public void testGetDateRangeAggregation()
             throws IOException {
         createIndex(INDEX);
-        PutMappingResponse putMappingResponse = client().admin().indices().putMapping(new PutMappingRequest(INDEX)
+        AcknowledgedResponse putMappingResponse = client().admin().indices().putMapping(new PutMappingRequest(INDEX)
                         .type(TYPE)
                 .source("{\"document\":{\"properties\":{\"delivery\":{\"store\":true,\"type\":\"date\"}}}}", XContentType.JSON)
         ).actionGet();
@@ -99,7 +99,7 @@ public class DateRangeAggregationIntegrationTest extends AbstractIntegrationTest
     public void testBadAggregationQueryResult()
             throws IOException {
         createIndex(INDEX);
-        PutMappingResponse putMappingResponse = client().admin().indices().putMapping(new PutMappingRequest(INDEX)
+        AcknowledgedResponse putMappingResponse = client().admin().indices().putMapping(new PutMappingRequest(INDEX)
                         .type(TYPE)
                 .source("{\"document\":{\"properties\":{\"delivery\":{\"store\":true,\"type\":\"date\"}}}}", XContentType.JSON)
         ).actionGet();
