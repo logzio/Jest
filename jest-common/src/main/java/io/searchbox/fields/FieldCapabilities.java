@@ -5,24 +5,18 @@ import io.searchbox.action.GenericResultAbstractAction;
 import io.searchbox.client.config.ElasticsearchVersion;
 import io.searchbox.params.Parameters;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collection;
 
 public class FieldCapabilities extends GenericResultAbstractAction {
+
     protected FieldCapabilities(FieldCapabilities.Builder builder) {
         super(builder);
-
         this.indexName = builder.index;
-
-        Map<String, Object> fieldStatsBody = new HashMap<>();
-        fieldStatsBody.put("fields", builder.fields);
-
-        this.payload = fieldStatsBody;
     }
 
     @Override
     public String getRestMethodName() {
-        return "POST";
+        return "GET";
     }
 
     @Override
@@ -38,10 +32,9 @@ public class FieldCapabilities extends GenericResultAbstractAction {
     public static class Builder extends AbstractAction.Builder<FieldCapabilities, FieldCapabilities.Builder> {
 
         private String index;
-        private Object fields;
 
-        public Builder(Object fields) {
-            this.fields = fields;
+        public Builder(Collection<String> fields) {
+            this.parameters.put("fields", String.join(",", fields));
         }
 
         public FieldCapabilities.Builder setIndex(String index) {
