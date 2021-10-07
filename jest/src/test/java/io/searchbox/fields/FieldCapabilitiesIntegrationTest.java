@@ -19,7 +19,7 @@ public class FieldCapabilitiesIntegrationTest extends AbstractIntegrationTest {
     private static final String INDEX = "twitter";
     private static final String TYPE = "tweet";
     private static final String TEST_FIELD = "test_name";
-    private static final List FIELDS = Collections.singletonList(TEST_FIELD);
+    private static final List<String> FIELDS = Collections.singletonList(TEST_FIELD);
 
     @Test
     public void testFieldCapabilities() throws IOException {

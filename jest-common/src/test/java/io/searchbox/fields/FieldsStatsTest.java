@@ -1,6 +1,5 @@
 package io.searchbox.fields;
 
-import com.google.gson.Gson;
 import io.searchbox.client.config.ElasticsearchVersion;
 import org.junit.Test;
 
@@ -17,24 +16,21 @@ public class FieldsStatsTest {
     @Test
     public void testBasicUriGeneration() {
         FieldCapabilities fieldCapabilities = new FieldCapabilities.Builder(FIELDS).setIndex(INDEX).build();
-        assertEquals("POST", fieldCapabilities.getRestMethodName());
-        assertEquals(INDEX + "/_field_caps", fieldCapabilities.getURI(ElasticsearchVersion.UNKNOWN));
-        assertEquals("{\"fields\":[\"" + TEST_FIELD + "\"]}", fieldCapabilities.getData(new Gson()));
+        assertEquals("GET", fieldCapabilities.getRestMethodName());
+        assertEquals(INDEX + "/_field_caps?fields=test_name", fieldCapabilities.getURI(ElasticsearchVersion.UNKNOWN));
     }
 
     @Test
     public void testBasicUriGenerationNoIndex() {
         FieldCapabilities fieldCapabilities = new FieldCapabilities.Builder(FIELDS).build();
-        assertEquals("POST", fieldCapabilities.getRestMethodName());
-        assertEquals("_field_caps", fieldCapabilities.getURI(ElasticsearchVersion.UNKNOWN));
-        assertEquals("{\"fields\":[\"" + TEST_FIELD + "\"]}", fieldCapabilities.getData(new Gson()));
+        assertEquals("GET", fieldCapabilities.getRestMethodName());
+        assertEquals("_field_caps?fields=test_name", fieldCapabilities.getURI(ElasticsearchVersion.UNKNOWN));
     }
 
     @Test
     public void testBasicUriGenerationWithLevel() {
         FieldCapabilities fieldCapabilities = new FieldCapabilities.Builder(FIELDS).setIndex(INDEX).setLevel("indices").build();
-        assertEquals("POST", fieldCapabilities.getRestMethodName());
-        assertEquals(INDEX + "/_field_caps?level=indices", fieldCapabilities.getURI(ElasticsearchVersion.UNKNOWN));
-        assertEquals("{\"fields\":[\"" + TEST_FIELD + "\"]}", fieldCapabilities.getData(new Gson()));
+        assertEquals("GET", fieldCapabilities.getRestMethodName());
+        assertEquals(INDEX + "/_field_caps?fields=test_name&level=indices", fieldCapabilities.getURI(ElasticsearchVersion.UNKNOWN));
     }
 }
