@@ -4,6 +4,7 @@ import io.searchbox.client.JestClientFactory;
 import io.searchbox.client.config.HttpClientConfig;
 import io.searchbox.client.http.JestHttpClient;
 import org.elasticsearch.action.get.GetResponse;
+import org.elasticsearch.analysis.common.CommonAnalysisPlugin;
 import org.elasticsearch.common.network.NetworkModule;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.http.HttpTransportSettings;
@@ -44,7 +45,8 @@ public abstract class AbstractIntegrationTest extends ESIntegTestCase {
 
     @Override
     protected Collection<Class<? extends Plugin>> nodePlugins() {
-        return Arrays.asList(Netty4Plugin.class, PainlessPlugin.class, PercolatorPlugin.class, MustachePlugin.class);
+        return Arrays.asList(Netty4Plugin.class, PainlessPlugin.class,
+                PercolatorPlugin.class, MustachePlugin.class, CommonAnalysisPlugin.class);
     }
 
     @Override

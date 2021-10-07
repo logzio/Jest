@@ -4,7 +4,7 @@ import io.searchbox.common.AbstractIntegrationTest;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
-import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
+import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.test.ESIntegTestCase;
 import org.junit.Test;
@@ -27,7 +27,7 @@ public class DateRangeAggregationIntegrationTest extends AbstractIntegrationTest
     public void testGetDateRangeAggregation()
             throws IOException {
         createIndex(INDEX);
-        PutMappingResponse putMappingResponse = client().admin().indices().putMapping(new PutMappingRequest(INDEX)
+        AcknowledgedResponse putMappingResponse = client().admin().indices().putMapping(new PutMappingRequest(INDEX)
                         .type(TYPE)
                 .source("{\"document\":{\"properties\":{\"delivery\":{\"store\":true,\"type\":\"date\"}}}}", XContentType.JSON)
         ).actionGet();
@@ -99,7 +99,7 @@ public class DateRangeAggregationIntegrationTest extends AbstractIntegrationTest
     public void testBadAggregationQueryResult()
             throws IOException {
         createIndex(INDEX);
-        PutMappingResponse putMappingResponse = client().admin().indices().putMapping(new PutMappingRequest(INDEX)
+        AcknowledgedResponse putMappingResponse = client().admin().indices().putMapping(new PutMappingRequest(INDEX)
                         .type(TYPE)
                 .source("{\"document\":{\"properties\":{\"delivery\":{\"store\":true,\"type\":\"date\"}}}}", XContentType.JSON)
         ).actionGet();
@@ -144,13 +144,13 @@ public class DateRangeAggregationIntegrationTest extends AbstractIntegrationTest
         assertNull(dateRange.getBuckets().get(0).getFrom());
         assertNull(dateRange.getBuckets().get(0).getFromAsString());
         assertEquals(Double.valueOf("1.35984966E12"), dateRange.getBuckets().get(0).getTo());
-        assertEquals("2013-02-03T00:01:00.000Z", dateRange.getBuckets().get(0).getToAsString());
+        assertEquals("2013-02-03", dateRange.getBuckets().get(0).getToAsString());
 
         assertTrue(0L == dateRange.getBuckets().get(1).getCount());
         assertNull(dateRange.getBuckets().get(1).getTo());
         assertNull(dateRange.getBuckets().get(1).getToAsString());
         assertEquals(Double.valueOf("1.35984966E12"), dateRange.getBuckets().get(1).getFrom());
-        assertEquals("2013-02-03T00:01:00.000Z", dateRange.getBuckets().get(1).getFromAsString());
+        assertEquals("2013-02-03", dateRange.getBuckets().get(1).getFromAsString());
 
         Aggregation aggregation = result.getAggregations().getAggregation("date_range1", DateRangeAggregation.class);
         assertTrue(aggregation instanceof DateRangeAggregation);
