@@ -1,7 +1,6 @@
 package io.searchbox.client.config.discovery;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.AbstractScheduledService;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -78,7 +77,7 @@ public class NodeChecker extends AbstractScheduledService {
             return;
             // do not elevate the exception since that will stop the scheduled calls.
             // throw new RuntimeException("Error executing NodesInfo!", e);
-        }  
+        }
 
         if (result.isSucceeded()) {
             LinkedHashSet<String> httpHosts = new LinkedHashSet<String>();
@@ -91,13 +90,9 @@ public class NodeChecker extends AbstractScheduledService {
                     JsonObject host = entry.getValue().getAsJsonObject();
                     JsonElement addressElement = null;
                     if (host.has("version")) {
-                        int majorVersion = Integer.parseInt(Splitter.on('.').splitToList(host.get("version").getAsString()).get(0));
-
-                        if (majorVersion >= 5) {
-                            JsonObject http = host.getAsJsonObject("http");
-                            if (http != null && http.has(PUBLISH_ADDRESS_KEY_V5))
-                                addressElement = http.get(PUBLISH_ADDRESS_KEY_V5);
-                        }
+                        JsonObject http = host.getAsJsonObject("http");
+                        if (http != null && http.has(PUBLISH_ADDRESS_KEY_V5))
+                            addressElement = http.get(PUBLISH_ADDRESS_KEY_V5);
                     }
 
                     if (addressElement == null) {
@@ -107,15 +102,19 @@ public class NodeChecker extends AbstractScheduledService {
 
                     if (addressElement != null && !addressElement.isJsonNull()) {
                         String httpAddress = getHttpAddress(addressElement.getAsString());
-                        if(httpAddress != null) httpHosts.add(httpAddress);
+                        if (httpAddress != null) httpHosts.add(httpAddress);
                     }
-              }
+                }
             }
             if (log.isDebugEnabled()) {
                 log.debug("Discovered {} HTTP hosts: {}", httpHosts.size(), Joiner.on(',').join(httpHosts));
             }
-            discoveredServerList = httpHosts;
-            client.setServers(discoveredServerList);
+            if (!httpHosts.isEmpty()) {
+                discoveredServerList = httpHosts;
+                client.setServers(discoveredServerList);
+            } else {
+                log.warn("Could not extract server hosts from NodesInfo response");
+            }
         } else {
             log.warn("NodesInfo request resulted in error: {}", result.getErrorMessage());
             client.setServers(bootstrapServerList);
@@ -129,9 +128,9 @@ public class NodeChecker extends AbstractScheduledService {
             log.info("Discovered server pool is now: {}", Joiner.on(',').join(discoveredServerList));
         }
         if (!discoveredServerList.isEmpty()) {
-          client.setServers(discoveredServerList);
+            client.setServers(discoveredServerList);
         } else {
-          client.setServers(bootstrapServerList);
+            client.setServers(bootstrapServerList);
         }
     }
 

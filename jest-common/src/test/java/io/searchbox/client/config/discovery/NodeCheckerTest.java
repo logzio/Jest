@@ -205,12 +205,7 @@ public class NodeCheckerTest {
         nodeChecker.runOneIteration();
 
         verify(jestClient).execute(isA(Action.class));
-        ArgumentCaptor<LinkedHashSet> argument = ArgumentCaptor.forClass(LinkedHashSet.class);
-        verify(jestClient).setServers(argument.capture());
         verifyNoMoreInteractions(jestClient);
-
-        Set servers = argument.getValue();
-        assertEquals(0, servers.size());
     }
 
     @Test
@@ -232,12 +227,7 @@ public class NodeCheckerTest {
         nodeChecker.runOneIteration();
 
         verify(jestClient).execute(isA(Action.class));
-        ArgumentCaptor<LinkedHashSet> argument = ArgumentCaptor.forClass(LinkedHashSet.class);
-        verify(jestClient).setServers(argument.capture());
         verifyNoMoreInteractions(jestClient);
-
-        Set servers = argument.getValue();
-        assertEquals(0, servers.size());
     }
 
     @Test
