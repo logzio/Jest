@@ -6,7 +6,7 @@
     <groupId>io.searchbox</groupId>
     <artifactId>jest-parent</artifactId>
     <packaging>pom</packaging>
-    <version>6.3.1-Logzio-10</version>
+    <version>6.3.1-Logzio-11</version>
     <name>Jest Parent POM</name>
     <description>Parent POM for Jest - ElasticSearch Java rest client</description>
     <url>https://github.com/searchbox-io/Jest</url>
@@ -73,7 +73,7 @@
         <httpclientandroid.version>4.3.5.1</httpclientandroid.version>
 
         <slf4j.version>1.7.25</slf4j.version>
-        <log4j.version>2.15.0</log4j.version>
+        <log4j.version>2.16.0</log4j.version>
 
         <guava.version>21.0</guava.version>
         <gson.version>2.8.0</gson.version>
