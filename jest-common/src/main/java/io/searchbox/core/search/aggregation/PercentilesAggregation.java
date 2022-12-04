@@ -1,6 +1,7 @@
 package io.searchbox.core.search.aggregation;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 
 import java.util.HashMap;
@@ -14,6 +15,7 @@ public class PercentilesAggregation extends MetricAggregation {
 
     public static final String TYPE = "percentiles";
 
+    private JsonNull jsonNull = JsonNull.INSTANCE;
     private Map<String, Double> percentiles = new HashMap<String, Double>();
 
     public PercentilesAggregation(String name, JsonObject percentilesAggregation) {
@@ -23,7 +25,8 @@ public class PercentilesAggregation extends MetricAggregation {
 
     private void parseSource(JsonObject source) {
         for (Map.Entry<String, JsonElement> entry : source.entrySet()) {
-            if(!(Double.isNaN(entry.getValue().getAsDouble()))) {
+            // In case of no results, in Elasticsearch the behaviour was to get 'NaN' and in OpenSearch is 'null'
+            if(!entry.getValue().equals(jsonNull) && !(Double.isNaN(entry.getValue().getAsDouble()))) {
                 percentiles.put(entry.getKey(), entry.getValue().getAsDouble());
             }
         }
