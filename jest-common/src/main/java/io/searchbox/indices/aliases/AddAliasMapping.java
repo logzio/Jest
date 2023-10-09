@@ -14,6 +14,7 @@ public class AddAliasMapping extends AliasMapping {
         this.indices.addAll(builder.indices);
         this.alias = builder.alias;
         this.filter = builder.filter;
+        this.writeIndex = builder.writeIndex;
         this.searchRouting.addAll(builder.searchRouting);
         this.indexRouting.addAll(builder.indexRouting);
     }
@@ -25,12 +26,19 @@ public class AddAliasMapping extends AliasMapping {
 
     public static class Builder extends AbstractAliasMappingBuilder<AddAliasMapping, Builder> {
 
+        private boolean writeIndex;
+
         public Builder(List<String> indices, String alias) {
             super(indices, alias);
         }
 
         public Builder(String index, String alias) {
             super(index, alias);
+        }
+
+        public Builder setWriteIndex(boolean writeIndex) {
+            this.writeIndex = writeIndex;
+            return this;
         }
 
         @Override
