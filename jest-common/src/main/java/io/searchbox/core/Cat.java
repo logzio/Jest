@@ -91,6 +91,32 @@ public class Cat extends AbstractAction<CatResult> {
         }
     }
 
+    public static class TemplatesBuilder extends AbstractAction.Builder<Cat, TemplatesBuilder> implements CatBuilder {
+        private static final String operationPath = "templates";
+
+        private String templateName;
+
+        public TemplatesBuilder() {
+            setHeader("accept", "application/json");
+            setHeader("content-type", "application/json");
+        }
+
+        public TemplatesBuilder templateName(String templateName) {
+            this.templateName = templateName;
+            return this;
+        }
+
+        @Override
+        public Cat build() {
+            return new Cat(this);
+        }
+
+        @Override
+        public String operationPath() {
+            return templateName == null ? operationPath : operationPath + "/" + templateName;
+        }
+    }
+
     public static class AliasesBuilder extends AbstractMultiIndexActionBuilder<Cat, AliasesBuilder> implements CatBuilder {
         private static final String operationPath = "aliases";
         public AliasesBuilder() {
