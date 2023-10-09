@@ -12,6 +12,7 @@ public abstract class AliasMapping {
     protected List<String> indices = new LinkedList<String>();
     protected String alias;
     protected Map<String, Object> filter;
+    protected boolean writeIndex;
     protected List<String> searchRouting = new LinkedList<String>();
     protected List<String> indexRouting = new LinkedList<String>();
 
@@ -27,6 +28,10 @@ public abstract class AliasMapping {
 
             if (filter != null) {
                 paramsMap.put("filter", filter);
+            }
+
+            if (writeIndex) {
+                paramsMap.put("is_write_index", true);
             }
 
             if (searchRouting.size() > 0) {
