@@ -17,7 +17,6 @@ public class ClientConfig {
     private Set<String> serverList;
     private boolean isMultiThreaded;
     private boolean isDiscoveryEnabled;
-    private String discoveryFilter;
     private boolean isRequestCompressionEnabled;
     private int connTimeout;
     private int readTimeout;
@@ -36,7 +35,6 @@ public class ClientConfig {
         this.serverList = builder.serverList;
         this.isMultiThreaded = builder.isMultiThreaded;
         this.isDiscoveryEnabled = builder.isDiscoveryEnabled;
-        this.discoveryFilter = builder.discoveryFilter;
         this.isRequestCompressionEnabled = builder.isRequestCompressionEnabled;
         this.discoveryFrequency = builder.discoveryFrequency;
         this.discoveryFrequencyTimeUnit = builder.discoveryFrequencyTimeUnit;
@@ -58,10 +56,6 @@ public class ClientConfig {
 
     public boolean isDiscoveryEnabled() {
         return isDiscoveryEnabled;
-    }
-
-    public String getDiscoveryFilter() {
-        return discoveryFilter;
     }
 
     public Long getDiscoveryFrequency() {
@@ -127,7 +121,6 @@ public class ClientConfig {
                 isDiscoveryEnabled,
                 isRequestCompressionEnabled,
                 discoveryFrequency,
-                discoveryFilter,
                 connTimeout,
                 readTimeout,
                 discoveryFrequencyTimeUnit,
@@ -155,7 +148,6 @@ public class ClientConfig {
                 && Objects.equals(isDiscoveryEnabled, rhs.isDiscoveryEnabled)
                 && Objects.equals(isRequestCompressionEnabled, rhs.isRequestCompressionEnabled)
                 && Objects.equals(discoveryFrequency, rhs.discoveryFrequency)
-                && Objects.equals(discoveryFilter, rhs.discoveryFilter)
                 && Objects.equals(connTimeout, rhs.connTimeout)
                 && Objects.equals(readTimeout, rhs.readTimeout)
                 && Objects.equals(discoveryFrequencyTimeUnit, rhs.discoveryFrequencyTimeUnit)
@@ -195,7 +187,6 @@ public class ClientConfig {
             this.isMultiThreaded = clientConfig.isMultiThreaded;
             this.isDiscoveryEnabled = clientConfig.isDiscoveryEnabled;
             this.discoveryFrequency = clientConfig.discoveryFrequency;
-            this.discoveryFilter = clientConfig.discoveryFilter;
             this.discoveryFrequencyTimeUnit = clientConfig.discoveryFrequencyTimeUnit;
             this.connTimeout = clientConfig.connTimeout;
             this.readTimeout = clientConfig.readTimeout;

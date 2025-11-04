@@ -38,7 +38,9 @@ public class NodeChecker extends AbstractScheduledService {
     private final static String PUBLISH_ADDRESS_KEY_V5 = "publish_address"; // The one that under "http" node
     private final static Pattern INETSOCKETADDRESS_PATTERN = Pattern.compile("(?:inet\\[)?(?:(?:[^:]+)?\\/)?([^:]+):(\\d+)\\]?");
 
-    private final NodesInfo action;
+    private final NodesInfo action = new NodesInfo.Builder()
+            .withHttp()
+            .build();;
 
     protected JestClient client;
     protected Scheduler scheduler;
@@ -49,10 +51,6 @@ public class NodeChecker extends AbstractScheduledService {
     public NodeChecker(JestClient jestClient, ClientConfig clientConfig) {
         this.client = jestClient;
         this.defaultScheme = clientConfig.getDefaultSchemeForDiscoveredNodes();
-        this.action = new NodesInfo.Builder()
-                .withHttp()
-                .addNode(clientConfig.getDiscoveryFilter())
-                .build();
         this.scheduler = Scheduler.newFixedDelaySchedule(
                 0l,
                 clientConfig.getDiscoveryFrequency(),
