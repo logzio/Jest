@@ -15,7 +15,10 @@ import io.searchbox.cluster.NodesInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.Executors;
@@ -44,12 +47,12 @@ public class NodeChecker extends AbstractScheduledService {
     protected Set<String> discoveredServerList;
 
     public NodeChecker(JestClient jestClient, ClientConfig clientConfig) {
-        action = new NodesInfo.Builder()
+        this.client = jestClient;
+        this.defaultScheme = clientConfig.getDefaultSchemeForDiscoveredNodes();
+        this.action = new NodesInfo.Builder()
                 .withHttp()
                 .addNode(clientConfig.getDiscoveryFilter())
                 .build();
-        this.client = jestClient;
-        this.defaultScheme = clientConfig.getDefaultSchemeForDiscoveredNodes();
         this.scheduler = Scheduler.newFixedDelaySchedule(
                 0l,
                 clientConfig.getDiscoveryFrequency(),
@@ -89,20 +92,23 @@ public class NodeChecker extends AbstractScheduledService {
 
                     JsonObject host = entry.getValue().getAsJsonObject();
                     JsonElement addressElement = null;
-                    if (host.has("version")) {
-                        JsonObject http = host.getAsJsonObject("http");
-                        if (http != null && http.has(PUBLISH_ADDRESS_KEY_V5))
-                            addressElement = http.get(PUBLISH_ADDRESS_KEY_V5);
-                    }
+                    if (host.has("roles") && isClientNode(host.getAsJsonArray("roles").iterator())) {
 
-                    if (addressElement == null) {
-                        // get as a JsonElement first as some nodes in the cluster may not have an http_address
-                        if (host.has(PUBLISH_ADDRESS_KEY)) addressElement = host.get(PUBLISH_ADDRESS_KEY);
-                    }
+                        if (host.has("version")) {
+                            JsonObject http = host.getAsJsonObject("http");
+                            if (http != null && http.has(PUBLISH_ADDRESS_KEY_V5))
+                                addressElement = http.get(PUBLISH_ADDRESS_KEY_V5);
+                        }
 
-                    if (addressElement != null && !addressElement.isJsonNull()) {
-                        String httpAddress = getHttpAddress(addressElement.getAsString());
-                        if (httpAddress != null) httpHosts.add(httpAddress);
+                        if (addressElement == null) {
+                            // get as a JsonElement first as some nodes in the cluster may not have an http_address
+                            if (host.has(PUBLISH_ADDRESS_KEY)) addressElement = host.get(PUBLISH_ADDRESS_KEY);
+                        }
+
+                        if (addressElement != null && !addressElement.isJsonNull()) {
+                            String httpAddress = getHttpAddress(addressElement.getAsString());
+                            if (httpAddress != null) httpHosts.add(httpAddress);
+                        }
                     }
                 }
             }
@@ -119,6 +125,16 @@ public class NodeChecker extends AbstractScheduledService {
             log.warn("NodesInfo request resulted in error: {}", result.getErrorMessage());
             client.setServers(bootstrapServerList);
         }
+    }
+
+    private boolean isClientNode(Iterator<JsonElement> roles) {
+        List<String> rolesList = new ArrayList<>();
+        while (roles.hasNext()) {
+            String role = roles.next().getAsString();
+            if (role.equals("ingest")) return true;
+            rolesList.add(role);
+        }
+        return !rolesList.stream().anyMatch(role -> !role.equals("remote_cluster_client"));
     }
 
     protected void removeNodeAndUpdateServers(final String hostToRemove) {
@@ -142,22 +158,26 @@ public class NodeChecker extends AbstractScheduledService {
     @Override
     protected ScheduledExecutorService executor() {
         final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(
-            new ThreadFactoryBuilder()
-                .setDaemon(true)
-                .setNameFormat(serviceName())
-                .build());
+                new ThreadFactoryBuilder()
+                        .setDaemon(true)
+                        .setNameFormat(serviceName())
+                        .build());
         // Add a listener to shutdown the executor after the service is stopped.  This ensures that the
         // JVM shutdown will not be prevented from exiting after this service has stopped or failed.
         // Technically this listener is added after start() was called so it is a little gross, but it
         // is called within doStart() so we know that the service cannot terminate or fail concurrently
         // with adding this listener so it is impossible to miss an event that we are interested in.
         addListener(new Listener() {
-            @Override public void terminated(State from) {
+            @Override
+            public void terminated(State from) {
                 executor.shutdown();
             }
-            @Override public void failed(State from, Throwable failure) {
+
+            @Override
+            public void failed(State from, Throwable failure) {
                 executor.shutdown();
-            }}, MoreExecutors.directExecutor());
+            }
+        }, MoreExecutors.directExecutor());
         return executor;
     }
 
