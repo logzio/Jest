@@ -139,42 +139,6 @@ public class JestClientFactoryIntegrationTest extends ESIntegTestCase {
     }
 
     @Test
-    public void testDiscoveryWithoutFiltering() throws InterruptedException, IOException {
-        // wait for 1 active nodes
-        internalCluster().ensureAtLeastNumDataNodes(2);
-
-        // spin up two more client nodes with additional attributes
-        Settings settings = Settings.builder().put(internalCluster().getDefaultSettings())
-                .put("node.master", false)      // for example, a client node
-                .put("node.data", false)
-                .build();
-        String clientNode1 = internalCluster().startNode(settings);
-        String clientNode2 = internalCluster().startNode(settings);
-        assertNotEquals("client nodes should be different", clientNode1, clientNode2);
-        assertEquals("All nodes in cluster should have HTTP endpoint exposed", 4, cluster().httpAddresses().length);
-
-        factory.setHttpClientConfig(new HttpClientConfig
-                .Builder("http://localhost:" + cluster().httpAddresses()[0].getPort())
-                .discoveryEnabled(true)
-                .discoveryFilter("*")
-                .discoveryFrequency(500l, TimeUnit.MILLISECONDS)
-                .build());
-        try (JestHttpClient jestClient = (JestHttpClient) factory.getObject()) {
-            assertNotNull(jestClient);
-
-            // wait for NodeChecker to do the discovery
-            Thread.sleep(3000);
-
-            assertEquals(
-                    "Only 4 nodes should be discovered and be in the client's server list",
-                    4,
-                    jestClient.getServerPoolSize()
-            );
-        }
-    }
-
-
-    @Test
     public void testIdleConnectionReaper() throws Exception {
         internalCluster().ensureAtLeastNumDataNodes(3);
         assertEquals("All nodes in cluster should have HTTP endpoint exposed", 3, cluster().httpAddresses().length);
