@@ -97,8 +97,8 @@ public class JestClientFactoryIntegrationTest extends ESIntegTestCase {
             Thread.sleep(3000);
 
             assertEquals(
-                    "Only 2 nodes should be discovered and be in the client's server list",
-                    2,
+                    "All 5 nodes should be discovered and be in the client's server list because discoverFilter is disabled",
+                    5,
                     jestClient.getServerPoolSize()
             );
         }
@@ -122,7 +122,6 @@ public class JestClientFactoryIntegrationTest extends ESIntegTestCase {
         factory.setHttpClientConfig(new HttpClientConfig
                 .Builder("http://localhost:" + cluster().httpAddresses()[0].getPort())
                 .discoveryEnabled(true)
-                .discoveryFilter("*")
                 .discoveryFrequency(500l, TimeUnit.MILLISECONDS)
                 .build());
         try (JestHttpClient jestClient = (JestHttpClient) factory.getObject()) {
@@ -138,7 +137,6 @@ public class JestClientFactoryIntegrationTest extends ESIntegTestCase {
             );
         }
     }
-
 
     @Test
     public void testIdleConnectionReaper() throws Exception {
