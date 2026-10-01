@@ -57,6 +57,7 @@
         <dependency>
             <groupId>org.elasticsearch.test</groupId>
             <artifactId>framework</artifactId>
+            <version>8.2.0</version>
         </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
